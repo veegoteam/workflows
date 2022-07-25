@@ -34,7 +34,7 @@ jobs:
           git push --set-upstream origin ${HELM_BRANCH}
       - name: Update tag in helm repo main
       if: github.ref == 'refs/heads/main'
-      id: update-tag
+      id: update-tag-main
       env:
         IMAGE_TAG: build-${{ github.sha }}
         CIJOBTOKENWRITE: ${{ secrets.CIJOBTOKENWRITE }}
