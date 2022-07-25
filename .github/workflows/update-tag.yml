@@ -8,6 +8,8 @@ on:
         type: string
 
 env:
+  IMAGE_TAG: build-${{ github.sha }}
+  CIJOBTOKENWRITE: ${{ secrets.CIJOBTOKENWRITE }}
   HELM_REPO: github.com/veegoteam/helm-charts.git
   HELM_BRANCH: dev
 
@@ -21,29 +23,22 @@ jobs:
       - name: Update tag in helm repo dev
         if: github.ref == 'refs/heads/develop'
         id: update-tag
-        env:
-          IMAGE_TAG: build-${{ github.sha }}
-          CIJOBTOKENWRITE: ${{ secrets.CIJOBTOKENWRITE }}
         run: |
           # Update tag in helm repo 
           git config --global user.email "githubdeploy@veego.io" && git config --global user.name "githubdeployveego" && git config --global init.defaultBranch main
           rm -rf build && mkdir build && git remote rm origin && git rm -rf . && cd build/
           git init && git remote add origin https://${CIJOBTOKENWRITE}@${HELM_REPO} && git pull origin ${HELM_BRANCH} && git checkout ${HELM_BRANCH} && git status && pwd && ls -la
-          cd ${HELM_PROJECT_PATH} && sed -i "s/tag:.*/tag:\ $IMAGE_TAG/" values.yaml && sed -i "s/tag:.*/tag:\ $IMAGE_TAG/" azure-demo-values.yaml && git add ${HELM_VALUES_FILE} && cat ${HELM_VALUES_FILE}
-          git commit -m "change tag to $IMAGE_TAG in /${HELM_PROJECT_PATH}/${HELM_VALUES_FILE}" || echo "No changes, nothing to commit!"
+          cd ${HELM_PROJECT_PATH} && sed -i "s/tag:.*/tag:\ $IMAGE_TAG/" values.yaml && sed -i "s/tag:.*/tag:\ $IMAGE_TAG/" azure-demo-values.yaml && git add values.yaml && git add azure-demo-values.yaml && cat values.yaml
+          git commit -m "change tag to $IMAGE_TAG in /${HELM_PROJECT_PATH}/values.yaml" || echo "No changes, nothing to commit!"
           git push --set-upstream origin ${HELM_BRANCH}
       - name: Update tag in helm repo main
-      if: github.ref == 'refs/heads/main'
-      id: update-tag-main
-      env:
-        IMAGE_TAG: build-${{ github.sha }}
-        CIJOBTOKENWRITE: ${{ secrets.CIJOBTOKENWRITE }}
-      run: |
-        # Update tag in helm repo 
-        git config --global user.email "githubdeploy@veego.io" && git config --global user.name "githubdeployveego" && git config --global init.defaultBranch main
-        rm -rf build && mkdir build && git remote rm origin && git rm -rf . && cd build/
-        git init && git remote add origin https://${CIJOBTOKENWRITE}@${HELM_REPO} && git pull origin ${HELM_BRANCH} && git checkout ${HELM_BRANCH} && git status && pwd && ls -la
-        cd ${HELM_PROJECT_PATH} && sed -i "s/tag:.*/tag:\ $IMAGE_TAG/" azure-dev-values.yaml && git add ${HELM_VALUES_FILE} && cat ${HELM_VALUES_FILE}
-        git commit -m "change tag to $IMAGE_TAG in /${HELM_PROJECT_PATH}/${HELM_VALUES_FILE}" || echo "No changes, nothing to commit!"
-        git push --set-upstream origin ${HELM_BRANCH}         
-
+        if: github.ref == 'refs/heads/main'
+        id: update-tag-main
+        run: |
+          # Update tag in helm repo 
+          git config --global user.email "githubdeploy@veego.io" && git config --global user.name "githubdeployveego" && git config --global init.defaultBranch main
+          rm -rf build && mkdir build && git remote rm origin && git rm -rf . && cd build/
+          git init && git remote add origin https://${CIJOBTOKENWRITE}@${HELM_REPO} && git pull origin ${HELM_BRANCH} && git checkout ${HELM_BRANCH} && git status && pwd && ls -la
+          cd ${HELM_PROJECT_PATH} && echo "$IMAGE_TAG" && sed -i "s/tag:.*/tag:\ $IMAGE_TAG/" azure-dev-values.yaml && git add azure-dev-values.yaml && cat azure-dev-values.yaml
+          git commit -m "change tag to $IMAGE_TAG in /${HELM_PROJECT_PATH}/azure-dev-values.yaml" || echo "No changes, nothing to commit!"
+          git push --set-upstream origin ${HELM_BRANCH}         
