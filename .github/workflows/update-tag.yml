@@ -47,3 +47,4 @@ jobs:
         cd ${HELM_PROJECT_PATH} && sed -i "s/tag:.*/tag:\ $IMAGE_TAG/" azure-dev-values.yaml && git add ${HELM_VALUES_FILE} && cat ${HELM_VALUES_FILE}
         git commit -m "change tag to $IMAGE_TAG in /${HELM_PROJECT_PATH}/${HELM_VALUES_FILE}" || echo "No changes, nothing to commit!"
         git push --set-upstream origin ${HELM_BRANCH}         
+
