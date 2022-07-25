@@ -18,7 +18,6 @@ jobs:
       id-token: write
       contents: read
     steps:
-
       - name: Update tag in helm repo dev
         if: github.ref == 'refs/heads/develop'
         id: update-tag
