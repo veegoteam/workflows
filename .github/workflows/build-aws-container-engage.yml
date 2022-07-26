@@ -59,6 +59,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
+          REACT_APP_API_URL: ${{inputs.REACT_APP_API_URL}}
           push: true
           tags: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.repository }}:${{ inputs.tag }}
           cache-from: type=gha
