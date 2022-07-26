@@ -18,6 +18,9 @@ on:
       awsRegion:
         required: true
 
+env:
+  REACT_APP_API_URL: ${{inputs.REACT_APP_API_URL}}
+
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
